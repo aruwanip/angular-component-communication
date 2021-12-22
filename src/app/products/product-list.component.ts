@@ -40,6 +40,10 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     this.parentListFilter = this.filterComponent.listFilter;
   }
 
+  onValueChange(value: string): void {
+    this.performFilter(value);
+  }
+
   toggleImage(): void {
     this.showImage = !this.showImage;
   }
