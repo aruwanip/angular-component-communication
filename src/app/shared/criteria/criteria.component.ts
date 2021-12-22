@@ -19,7 +19,7 @@ export class CriteriaComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() displayDetail: boolean;
   @Input() hitCount;
 
-  listFilter: string;
+  listFilter: string = 'cart';
   hitMessage: string;
   @ViewChild('filterElement') filterElementRef: ElementRef;
 
