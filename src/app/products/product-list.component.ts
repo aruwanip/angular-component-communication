@@ -1,6 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { NgModel } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { Component, OnInit,  } from '@angular/core';
 
 import { IProduct } from './product';
 import { ProductService } from './product.service';
@@ -9,10 +7,10 @@ import { ProductService } from './product.service';
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.css']
 })
-export class ProductListComponent implements OnInit, AfterViewInit {
+export class ProductListComponent implements OnInit {
   pageTitle: string = 'Product List';
   showImage: boolean;
-  listFilter: string;
+  includeDetail: boolean = true;
 
   imageWidth: number = 50;
   imageMargin: number = 2;
@@ -21,33 +19,6 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   filteredProducts: IProduct[];
   products: IProduct[];
 
-  @ViewChild('filterElement') filterElementRef: ElementRef;
-
-  private _filterInput: NgModel;
-  private _sub: Subscription;
-
-  get filterInput(): NgModel {
-    return this._filterInput;
-  }
-
-  @ViewChild(NgModel)
-  set filterInput(value: NgModel) {
-    this._filterInput = value;
-    console.log(this.filterInput);
-    if (this.filterInput && !this._sub) {
-      console.log('Subscribing');
-      this._sub = this.filterInput.valueChanges.subscribe(
-        () => {
-          this.performFilter(this.listFilter);
-          console.log('Performed the filter');
-        }
-      );
-    }
-    if (this.filterElementRef) {
-      this.filterElementRef.nativeElement.focus();
-    }
-  }
-
   constructor(private productService: ProductService) {
   }
 
@@ -55,17 +26,10 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     this.productService.getProducts().subscribe(
       (products: IProduct[]) => {
         this.products = products;
-        this.performFilter(this.listFilter);
+        this.performFilter();
       },
       (error: any) => this.errorMessage = <any>error
     );
-  }
-
-  ngAfterViewInit(): void {
-    // this.filterInput.valueChanges.subscribe(
-    //   () => this.performFilter(this.listFilter)
-    // );
-    // this.filterElementRef.nativeElement.focus();
   }
 
   toggleImage(): void {
