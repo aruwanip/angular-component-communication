@@ -58,20 +58,26 @@ export class ProductService {
 
   deleteProduct(id: number): Observable<IProduct> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-
     const url = `${ this.productsUrl }/${ id }`;
     return this.http.delete<IProduct>(url, { headers: headers })
       .pipe(
-        tap(data => console.log('deleteProduct: ' + id)),
+        tap(() => console.log('deleteProduct: ' + id)),
+        tap(() => {
+          const foundIndex = this.products.findIndex(item => item.id === id);
+          if (foundIndex > -1) {
+            this.products.splice(foundIndex, 1);
+          }
+        }),
         catchError(this.handleError)
       );
   }
 
   private createProduct(product: IProduct, headers: HttpHeaders): Observable<IProduct> {
-    product.id = null;
+    product.id = null; // Required by in-memory web API to assign ID when adding new item
     return this.http.post<IProduct>(this.productsUrl, product, { headers: headers })
       .pipe(
         tap(data => console.log('createProduct: ' + JSON.stringify(data))),
+        tap(data => this.products.push(data)),
         catchError(this.handleError)
       );
   }
@@ -80,7 +86,7 @@ export class ProductService {
     const url = `${ this.productsUrl }/${ product.id }`;
     return this.http.put<IProduct>(url, product, { headers: headers })
       .pipe(
-        tap(data => console.log('updateProduct: ' + product.id)),
+        tap(() => console.log('updateProduct: ' + product.id)),
         catchError(this.handleError)
       );
   }
