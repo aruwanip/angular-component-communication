@@ -9,6 +9,9 @@ import { IProduct } from './product';
 
 @Injectable()
 export class ProductService {
+
+  currentProduct: IProduct | null;
+
   private productsUrl = 'api/products';
   private products: IProduct[];
 
@@ -66,6 +69,7 @@ export class ProductService {
           const foundIndex = this.products.findIndex(item => item.id === id);
           if (foundIndex > -1) {
             this.products.splice(foundIndex, 1);
+            this.currentProduct = null;
           }
         }),
         catchError(this.handleError)
@@ -77,7 +81,10 @@ export class ProductService {
     return this.http.post<IProduct>(this.productsUrl, product, { headers: headers })
       .pipe(
         tap(data => console.log('createProduct: ' + JSON.stringify(data))),
-        tap(data => this.products.push(data)),
+        tap(data => {
+          this.products.push(data);
+          this.currentProduct = data;
+        }),
         catchError(this.handleError)
       );
   }
