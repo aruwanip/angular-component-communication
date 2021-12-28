@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { of } from 'rxjs/observable/of';
 import { catchError, tap } from 'rxjs/operators';
@@ -10,7 +10,7 @@ import { IProduct } from './product';
 @Injectable()
 export class ProductService {
 
-  private selectedProductSource = new Subject<IProduct | null>();
+  private selectedProductSource = new BehaviorSubject<IProduct | null>(null);
   private productsUrl = 'api/products';
   private products: IProduct[];
 
