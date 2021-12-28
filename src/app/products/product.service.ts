@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 import { of } from 'rxjs/observable/of';
 import { catchError, tap } from 'rxjs/operators';
@@ -10,10 +10,11 @@ import { IProduct } from './product';
 @Injectable()
 export class ProductService {
 
-  currentProduct: IProduct | null;
-
+  private selectedProductSource = new Subject<IProduct | null>();
   private productsUrl = 'api/products';
   private products: IProduct[];
+
+  selectedProductChanges$ = this.selectedProductSource.asObservable();
 
   constructor(private http: HttpClient) {
   }
@@ -51,6 +52,10 @@ export class ProductService {
       );
   }
 
+  changeSelectedProduct(selectedProduct: IProduct | null): void {
+    this.selectedProductSource.next(selectedProduct);
+  }
+
   saveProduct(product: IProduct): Observable<IProduct> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     if (product.id === 0) {
@@ -69,7 +74,7 @@ export class ProductService {
           const foundIndex = this.products.findIndex(item => item.id === id);
           if (foundIndex > -1) {
             this.products.splice(foundIndex, 1);
-            this.currentProduct = null;
+            this.changeSelectedProduct(null);
           }
         }),
         catchError(this.handleError)
@@ -83,7 +88,7 @@ export class ProductService {
         tap(data => console.log('createProduct: ' + JSON.stringify(data))),
         tap(data => {
           this.products.push(data);
-          this.currentProduct = data;
+          this.changeSelectedProduct(data);
         }),
         catchError(this.handleError)
       );
